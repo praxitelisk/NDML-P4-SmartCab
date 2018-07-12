@@ -8,8 +8,8 @@ class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
         This is the object you will be modifying. """ 
 
-    def __init__(self, env, learning=True, epsilon=1.0, alpha=0.6):
-        super(LearningAgent, self).__init__(env)     # Set the agent in the evironment 
+    def __init__(self, env, learning=True, epsilon=1.0, alpha=0.5):
+        super(LearningAgent, self).__init__(env)     # Set the agent in the evironment
         self.planner = RoutePlanner(self.env, self)  # Create a route planner
         self.valid_actions = self.env.valid_actions  # The set of valid actions
 
@@ -27,9 +27,9 @@ class LearningAgent(Agent):
         self.trial_num = 0
         self.prev_state = None
         
-        
-        
-        
+
+
+
 
     def reset(self, destination=None, testing=False):
         """ The reset function is called at the beginning of each trial.
@@ -51,9 +51,9 @@ class LearningAgent(Agent):
             self.alpha = 0
         else:
             # linear decay - default
-            #if self.epsilon > 0:
-            #    self.epsilon = self.epsilon - 0.05
-            
+            # if self.epsilon > 0:
+                # self.epsilon = self.epsilon - 0.05
+
 
             # # ###e=0.8^t####
             #self.epsilon = 0.8**self.trial_num
@@ -66,14 +66,15 @@ class LearningAgent(Agent):
             ##very slow Linear decay####
             #if self.epsilon >0:
             #    self.epsilon = self.epsilon-0.005
-            
 
-             ### epsilon = e^(-0.02t)
+
+            ### epsilon = e^(-0.02t)
             self.epsilon = math.exp(-0.02*self.trial_num)
-            self.trial_num = self.trial_num + 1  
-            
-            #self.alpha = self.epsilon
-            if self.alpha >0.2:
+            self.trial_num = self.trial_num + 1
+
+            self.alpha = self.epsilon
+
+            if self.alpha > 0.2:
                 self.alpha = self.alpha-0.02
 
         return None
@@ -96,8 +97,8 @@ class LearningAgent(Agent):
         #   If it is not, create a dictionary in the Q-table for the current 'state'
         #   For each action, set the Q-value for the state-action pair to 0
         
-        state = (waypoint, inputs['light'], inputs['oncoming'], inputs['left'])     
-        
+        state = (waypoint, inputs['light'], inputs['oncoming'], inputs['left'])
+
         self.prev_state = state
         return state
 
@@ -112,7 +113,7 @@ class LearningAgent(Agent):
         # Calculate the maximum Q-value of all actions for a given state
 
         maxQ = None
-        
+
         for key in self.Q[state]:
             if (maxQ == None) or (maxQ < self.Q[state][key]):
                 maxQ = self.Q[state][key]
@@ -144,7 +145,7 @@ class LearningAgent(Agent):
         # Set the agent state and default action
         self.state = state
         self.next_waypoint = self.planner.next_waypoint()
-        
+
 
         ########### 
         ## TO DO ##
@@ -216,16 +217,16 @@ def run():
     # Create the driving agent
     # Flags:
     #   learning   - set to True to force the driving agent to use Q-learning
-    #    * epsilon - continuous value for the exploration factor, default is 1
-    #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent)
+    #   epsilon - continuous value for the exploration factor, default is 1
+    #   alpha   - continuous value for the learning rate, default is 0.5
+    agent = env.create_agent(LearningAgent, learning=True)
     
     ##############
     # Follow the driving agent
     # Flags:
     #   enforce_deadline - set to True to enforce a deadline metric
-    #env.set_primary_agent(agent, enforce_deadline = False) # default optimization
-    env.set_primary_agent(agent, enforce_deadline = True)
+    # env.set_primary_agent(agent, enforce_deadline = False) # default optimization
+    env.set_primary_agent(agent, enforce_deadline=True)
     
     ##############
     # Create the simulation
@@ -234,8 +235,8 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    
-    #sim = Simulator(env, update_delay=0.01, log_metrics=True) # default optimization
+
+    # sim = Simulator(env, update_delay=0.01, log_metrics=True) # default optimization
     sim = Simulator(env, update_delay=0.01, log_metrics=True, optimized=True)
     
     ##############
@@ -243,7 +244,8 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=10, tolerance = 0.015)
+
+    sim.run(n_test=10, tolerance=0.015)
 
 
 if __name__ == '__main__':
